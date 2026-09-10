@@ -8,7 +8,10 @@ FIX = Path(__file__).parent / "fixtures"
 
 def _files():
     files = sorted(glob.glob(str(FIX / "*.html")))
-    return [f for f in files if "home" in f] + [f for f in files if "home" not in f]
+    # home first, matched on the file name: a CI runner lives in /home/runner,
+    # so matching on the full path would put every file in the first bucket.
+    return ([f for f in files if Path(f).name.startswith("home")]
+            + [f for f in files if not Path(f).name.startswith("home")])
 
 
 def test_run_on_local_files_writes_all_outputs(tmp_path):
