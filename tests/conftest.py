@@ -11,8 +11,11 @@ FIX = Path(__file__).parent / "fixtures"
 
 def _ordered_files():
     files = sorted(glob.glob(str(FIX / "*.html")))
-    # home first: it is the entry page for depth calculations
-    return [f for f in files if "home" in f] + [f for f in files if "home" not in f]
+    # home first: it is the entry page for depth calculations.
+    # match on the file name, never on the full path: a CI runner works
+    # inside /home/runner, which would make every path match "home".
+    return ([f for f in files if Path(f).name.startswith("home")]
+            + [f for f in files if not Path(f).name.startswith("home")])
 
 
 @pytest.fixture()
